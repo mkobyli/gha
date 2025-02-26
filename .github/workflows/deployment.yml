@@ -1,20 +1,20 @@
 name: Deployment app
 on: push
 jobs:
-    # lint:
-    #   runs-on: ubuntu-latest
-    #   steps:
-    #     - name: Run linting
-        #   run: npm lint
-    test:
-    #   needs: lint
+    lint:
       runs-on: ubuntu-latest
       steps:
         - name: Run linting
+          run: npm lint
+    test:
+      needs: lint
+      runs-on: ubuntu-latest
+      steps:
+        - name: Run test
           run: npm test
     build:
       needs: test
       runs-on: ubuntu-latest
       steps:
-        - name: Run linting
+        - name: Run build
           run: npm build
