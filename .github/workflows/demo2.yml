@@ -6,9 +6,19 @@ on:
 jobs:
     test:
       runs-on: ubuntu-latest
+      outputs:
+        npm-dir: ${{ steps.npm-cache-dir.outputs.dir }}
       steps:
         - name: Get code
           uses: actions/checkout@v3
+        - name: Get npm cache directory
+          id: npm-cache-dir
+          shell: bash
+          run: echo "dir=$(npm config get cache)" >> ${GITHUB_OUTPUT}
+        - uses: actions/cache@v4
+          with:
+            path: ${{ steps.npm-cache-dir.outputs.dir }}
+            key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
         - name: Install dependencies
           run: npm ci
         - name: Run linting
@@ -23,6 +33,10 @@ jobs:
       steps:
         - name: Get code
           uses: actions/checkout@v3
+        - uses: actions/cache@v4
+          with:
+            path: ${{ needs.test.outputs.dir }}
+            key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
         - name: Install dependencies
           run: npm ci
         - name: Run build
